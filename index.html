@@ -1,52 +1,81 @@
 <body>
+  <div id="main-container" style="border-radius: 35px; width: 500px; min-height: 500px; background-color: #afd666; display: flex; justify-content: center; padding:25px; align-items: center; flex-direction: column;">
+    <img style="background-color: white; border-radius: 50%; width: 100px;" src="https://images.squarespace-cdn.com/content/v1/5d7029e27df27100010e853a/4fbe11f8-8514-44a6-81a8-c22e1b96c483/JGeiger_Elements_RGBCompass+%281%29.png?format=500w" />
+    <h1>
+      J. Geiger Consulting
+    </h1>
+    <h2 style="margin-top: 0">
+      Dad Joke Generator
+    </h2>
+    <br>
+    <button id="joke-btn" style="background-color: black; color: white; border-radius: 15px; font-size: 20px; padding: 10px; padding-left: 15px; padding-right: 15px; font-weight: bold;">Generate Dad Joke</button>
+    <br>
+    <div id="joke-container" class="joke-container" style="line-height: 1.5; font-weight: bold; font-family: 'calluna'; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+      <div id="joke-setup"></div>
 
-<div style="border-radius:35px; width: 500px; min-height: 500px; background-color: #afd666; display: flex; justify-content: center; padding:25px; align-items: center; flex-direction: column;">
-<img style="margin-top: -50px ; background-color: white; border-radius: 50%; width: 100px;" src="https://images.squarespace-cdn.com/content/v1/5d7029e27df27100010e853a/4fbe11f8-8514-44a6-81a8-c22e1b96c483/JGeiger_Elements_RGBCompass+%281%29.png?format=500w"/>
-<h1>
-J. Geiger Consulting
-</h1>
-<h2 style="margin-top: 0">
-Dad Joke Generator
-</h2>
-<br>
-<button id="joke-btn" style="background-color: black; color: white; border-radius: 15px; font-size: 20px; padding: 10px; padding-left: 15px; padding-right: 15px; font-weight: bold;">Generate Dad Joke</button>
-<br>
-    <div id="joke-container" class="joke-container" style="line-height: 1.5; font-weight: bold; font-family: 'calluna'"></div>
+      <div id="joke-punchline" style="display: none; margin-top: 25px;"></div>
+      
+      <button id="reveal-answer-btn" style="display: none; background-color: black; color: white; border-radius: 15px; font-size: 20px; padding: 10px; padding-left: 15px; padding-right: 15px; font-weight: bold; margin-top: 25px;">Reveal Answer</button>
+    </div>
   </div>
-  
+
   <style>
-  .joke-container {
-    display: none; 
-    width: 500px; 
-    height: 100px; 
-    margin: 20px auto; 
-    text-align: center; 
-    font-size: 32px;
-  }
+    .joke-container {
+      width: 500px;
+      margin: 20px auto;
+      text-align: center;
+      font-size: 32px;
+    }
   </style>
-  
+
   <script>
-const jokeBtn = document.getElementById("joke-btn");
-const jokeContainer = document.getElementById("joke-container");
+    const jokeBtn = document.getElementById("joke-btn");
+    const jokeSetup = document.getElementById("joke-setup");
+    const jokePunchline = document.getElementById("joke-punchline");
+    const revealAnswerBtn = document.getElementById("reveal-answer-btn");
 
-jokeBtn.addEventListener("click", async () => {
-  // Clear previous joke text
-  jokeContainer.textContent = '';
 
-  let response = null;
-  let data = null;
-  do {
-    response = await fetch("https://icanhazdadjoke.com/", {
-      headers: {
-        "Accept": "application/json"
-      }
-    });
-    data = await response.json();
-  } while (data.joke.length > 90);
+    async function getJoke() {
+      let response = null;
+      let data = null;
+      do {
+        response = await fetch("https://icanhazdadjoke.com/", {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+        data = await response.json();
+      } while (!data.joke.includes("?"));
 
-  jokeContainer.textContent = data.joke;
-  jokeContainer.style.display = "block";
+      const jokeText = data.joke;
+      const [setup, punchline] = jokeText.split("?");
+      jokeSetup.textContent = setup + "?";
+      jokePunchline.textContent = punchline;
+      revealAnswerBtn.style.display = "block";
+    }
+
+    function revealAnswer() {
+      jokePunchline.style.display = "block";
+      revealAnswerBtn.style.display = "none";
+    }
+
+    function newJoke() {
+      jokeSetup.textContent = "";
+      jokePunchline.textContent = "";
+      jokePunchline.style.display = "none";
+      revealAnswerBtn.style.display = "none";
+      getJoke();
+    }
+
+    jokeBtn.addEventListener("click", () => {
+     
+jokeSetup.textContent = "Generating joke...";
+jokePunchline.textContent = "";
+jokePunchline.style.display = "none";
+revealAnswerBtn.style.display = "none";
+getJoke();
 });
+revealAnswerBtn.addEventListener("click", revealAnswer);
 
-  </script>
-  </body>
+</script>
+</body>
